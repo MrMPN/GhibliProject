@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="72dp"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+  <ImageView
+      android:id="@+id/listCover"
+      android:layout_width="56dp"
+      android:layout_height="56dp"
+      android:layout_marginStart="8dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      tools:src="@tools:sample/avatars" />
+
+  <LinearLayout
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:layout_marginStart="8dp"
+      android:orientation="vertical"
+      android:padding="5dp"
+      app:layout_constraintBottom_toBottomOf="@+id/listCover"
+      app:layout_constraintStart_toEndOf="@+id/listCover"
+      app:layout_constraintTop_toTopOf="@+id/listCover">
+
+    <TextView
+        android:id="@+id/listTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Material.Medium"
+        tools:text="@tools:sample/lorem[3]" />
+
+    <TextView
+        android:id="@+id/listYear"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.Material.Small"
+        tools:text="@tools:sample/lorem[4]" />
+  </LinearLayout>
+
+  <ImageView
+      android:id="@+id/listFavorite"
+      android:layout_width="30dp"
+      android:layout_height="30dp"
+      android:layout_marginEnd="8dp"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      app:srcCompat="@drawable/like" />
+
+</android.support.constraint.ConstraintLayout>
