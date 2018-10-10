@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -39,8 +41,10 @@ public class MainFragment extends Fragment implements ListItemClickListener {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
 
         List<Movie> list = new ArrayList<>();
-        list.add(new Movie("1", "Mononoke", "POTATO", "Hayao Miyazaki", "Senyor Random", 1997, 95 ));
-        list.add(new Movie("2", "Castell Ambulant", "LALALALALA", "Hayao Miyazaki", "Senyor Random 2", 1987, 83 ));
+        list.add(new Movie("1", "Mononoke", "POTATO", "Hayao Miyazaki",
+                "Senyor Random", 1997, 95 ));
+        list.add(new Movie("2", "Castell Ambulant", "LALALALALA",
+                "Hayao Miyazaki", "Senyor Random 2", 1987, 83 ));
         list.get(1).setFavorite(true);
         recyclerView = v.findViewById(R.id.list);
         adapter = new RecyclerViewAdapter(getContext(), this);
@@ -48,6 +52,7 @@ public class MainFragment extends Fragment implements ListItemClickListener {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter.setMovies(list);
 
+        setHasOptionsMenu(true);
         return v;
     }
 
@@ -62,5 +67,10 @@ public class MainFragment extends Fragment implements ListItemClickListener {
                 .addToBackStack(null)
                 .replace(R.id.container, fragment)
                 .commit();
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu, menu);
     }
 }

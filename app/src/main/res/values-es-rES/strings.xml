@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="director">Director:</string>
+    <string name="producer">Productor:</string>
+    <string name="year_of_release">Año de salida:</string>
+</resources>
