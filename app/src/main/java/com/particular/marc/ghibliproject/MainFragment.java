@@ -15,14 +15,17 @@ import com.particular.marc.ghibliproject.domain.Movie;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.particular.marc.ghibliproject.DetailFragment.MOVIE_KEY;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MainFragment extends Fragment implements ListItemClickListener {
 
-    RecyclerView recyclerView;
-    RecyclerViewAdapter adapter;
+
+    private RecyclerView recyclerView;
+    private RecyclerViewAdapter adapter;
 
 
     public MainFragment() {
@@ -38,6 +41,7 @@ public class MainFragment extends Fragment implements ListItemClickListener {
         List<Movie> list = new ArrayList<>();
         list.add(new Movie("1", "Mononoke", "POTATO", "Hayao Miyazaki", "Senyor Random", 1997, 95 ));
         list.add(new Movie("2", "Castell Ambulant", "LALALALALA", "Hayao Miyazaki", "Senyor Random 2", 1987, 83 ));
+        list.get(1).setFavorite(true);
         recyclerView = v.findViewById(R.id.list);
         adapter = new RecyclerViewAdapter(getContext(), this);
         recyclerView.setAdapter(adapter);
@@ -49,7 +53,10 @@ public class MainFragment extends Fragment implements ListItemClickListener {
 
     @Override
     public void onListItemClick(Movie clickedItem) {
+        Bundle arguments = new Bundle();
+        arguments.putParcelable(MOVIE_KEY, clickedItem);
         DetailFragment fragment = new DetailFragment();
+        fragment.setArguments(arguments);
         getFragmentManager()
                 .beginTransaction()
                 .addToBackStack(null)

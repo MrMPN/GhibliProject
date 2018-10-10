@@ -1,6 +1,9 @@
 package com.particular.marc.ghibliproject.domain;
 
-public class Movie {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Movie implements Parcelable {
     private String id;
     private String title;
     private String description;
@@ -83,4 +86,44 @@ public class Movie {
     public void setFavorite(boolean favorite) {
         this.favorite = favorite;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.id);
+        dest.writeString(this.title);
+        dest.writeString(this.description);
+        dest.writeString(this.director);
+        dest.writeString(this.producer);
+        dest.writeInt(this.releaseYear);
+        dest.writeInt(this.score);
+        dest.writeByte(this.favorite ? (byte) 1 : (byte) 0);
+    }
+
+    protected Movie(Parcel in) {
+        this.id = in.readString();
+        this.title = in.readString();
+        this.description = in.readString();
+        this.director = in.readString();
+        this.producer = in.readString();
+        this.releaseYear = in.readInt();
+        this.score = in.readInt();
+        this.favorite = in.readByte() != 0;
+    }
+
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }
