@@ -1,7 +1,9 @@
-package com.particular.marc.ghibliproject.domain;
+package com.particular.marc.ghibliproject.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.google.gson.annotations.SerializedName;
 
 public class Movie implements Parcelable {
     private String id;
@@ -9,7 +11,9 @@ public class Movie implements Parcelable {
     private String description;
     private String director;
     private String producer;
+    @SerializedName("release_date")
     private int releaseYear;
+    @SerializedName("rt_score")
     private int score;
     private  boolean favorite = false;
 

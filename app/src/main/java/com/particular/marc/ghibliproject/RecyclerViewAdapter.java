@@ -12,12 +12,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.particular.marc.ghibliproject.domain.Movie;
+import com.particular.marc.ghibliproject.model.Movie;
 
 import java.util.List;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
-
     private static final String TAG = "RecyclerViewAdapter";
     final private ListItemClickListener mOnClickListener;
     private List<Movie> mMovies;

@@ -9,13 +9,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.particular.marc.ghibliproject.domain.Movie;
+import com.particular.marc.ghibliproject.model.Movie;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class DetailFragment extends Fragment {
+    private static final String TAG = "DetailFragment";
     public static final String MOVIE_KEY = "movie_key";
     private static final int UNLIKE = 1;
     private static final int LIKE = 2;
@@ -72,15 +73,18 @@ public class DetailFragment extends Fragment {
         favoriteView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (favoriteView.getTag().equals(UNLIKE)){
-                    favoriteView.setImageResource(R.drawable.like);
-                    favoriteView.setTag(LIKE);
-                } else if (favoriteView.getTag().equals(LIKE)){
-                    favoriteView.setImageResource(R.drawable.unlike);
-                    favoriteView.setTag(UNLIKE);
-                }
+                changeFavoriteStatus();
             }
         });
     }
 
+    private void changeFavoriteStatus(){
+        if (favoriteView.getTag().equals(UNLIKE)){
+            favoriteView.setImageResource(R.drawable.like);
+            favoriteView.setTag(LIKE);
+        } else if (favoriteView.getTag().equals(LIKE)){
+            favoriteView.setImageResource(R.drawable.unlike);
+            favoriteView.setTag(UNLIKE);
+        }
+    }
 }

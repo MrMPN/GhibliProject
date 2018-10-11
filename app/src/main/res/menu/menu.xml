@@ -10,17 +10,17 @@
         android:title="Search"
         app:showAsAction="always" />
     <item
-        android:id="@+id/goToFavorite"
+        android:id="@+id/go_to_favorite"
         android:icon="@drawable/favorites"
         android:title="Favorites"
         app:showAsAction="always" />
     <item
-        android:id="@+id/sortByName"
+        android:id="@+id/sort_by_name"
         android:title="Sort by name" />
     <item
         android:id="@+id/sort_by_rating"
         android:title="Sort by rating" />
     <item
-        android:id="@+id/sortByYear"
+        android:id="@+id/sort_by_year"
         android:title="Sort by year" />
 </menu>
