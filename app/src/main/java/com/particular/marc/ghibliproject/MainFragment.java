@@ -18,6 +18,8 @@ import com.particular.marc.ghibliproject.model.Movie;
 import com.particular.marc.ghibliproject.network.ApiRequest;
 import com.particular.marc.ghibliproject.network.RetrofitClientInstance;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit2.Call;
@@ -64,6 +66,12 @@ public class MainFragment extends Fragment implements ListItemClickListener {
             @Override
             public void onResponse(Call<List<Movie>> call, Response<List<Movie>> response) {
                 List<Movie> list = response.body();
+                Collections.sort(list, new Comparator<Movie>() {
+                    @Override
+                    public int compare(Movie o1, Movie o2) {
+                        return o1.getTitle().compareToIgnoreCase(o2.getTitle());
+                    }
+                });
                 adapter.setMovies(list);
             }
 
