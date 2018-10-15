@@ -3,8 +3,11 @@ package com.particular.marc.ghibliproject.repository;
 
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.particular.marc.ghibliproject.AppExecutors;
@@ -30,6 +33,7 @@ public class MovieRepository {
     private MovieDao movieDao;
     private static MovieRepository instance;
     private final MutableLiveData<List<Movie>> data = new MutableLiveData<>();
+    private final MutableLiveData<List<Movie>> favs = new MutableLiveData<>();
     private AppExecutors mExecutors = AppExecutors.getInstance();
 
     public static synchronized MovieRepository getInstance(Application application){
@@ -40,10 +44,12 @@ public class MovieRepository {
     }
 
     private MovieRepository(Application application){
-        service = RetrofitClientInstance.getRetrofitInstance().create(ApiRequest.class);
-        fetchMovies();
+        Log.d(TAG, "MovieRepository: Initializing");
         AppDatabase db = AppDatabase.getInstance(application.getApplicationContext());
+        service = RetrofitClientInstance.getRetrofitInstance().create(ApiRequest.class);
         movieDao = db.movieDao();
+        fetchMovies();
+        fetchFavorites();
     }
 
     private void fetchMovies(){
@@ -53,7 +59,6 @@ public class MovieRepository {
             public void onResponse(@NonNull Call<List<Movie>> call, @NonNull Response<List<Movie>> response) {
                 List<Movie> list = response.body();
                 data.setValue(list);
-                fetchFavorites();
             }
             @Override
             public void onFailure(@NonNull Call<List<Movie>> call, @NonNull Throwable t) {
@@ -64,25 +69,34 @@ public class MovieRepository {
     }
 
     public void fetchFavorites(){
-        final List<Movie> movies = data.getValue();
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
-                List<Movie> favorites = movieDao.getFavorites();
-                tagFavorites(favorites, movies);
+                favs.postValue(movieDao.getFavorites());
             }
         });
     }
 
-    private void tagFavorites(List<Movie> favorites, List<Movie> movies){
-        for (Movie m: movies){
-            for (Movie f : favorites){
-                if (m.getId().equals(f.getId())){
-                    m.setFavorite(true);
-                }
+    public MediatorLiveData<MyTaggedMovies> checkSources(){
+        final MediatorLiveData<MyTaggedMovies> mediatorLiveData = new MediatorLiveData<>();
+        final MyTaggedMovies current = new MyTaggedMovies();
+        mediatorLiveData.addSource(data, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                //Log.d("TAG", "Mediator on Changed data:" + movies.toString());
+                current.movies = movies;
+                mediatorLiveData.setValue(current);
             }
-        }
-        data.postValue(movies);
+        });
+        mediatorLiveData.addSource(favs, new Observer<List<Movie>>() {
+            @Override
+            public void onChanged(@Nullable List<Movie> movies) {
+                Log.d("TAG", "Mediator on Changed favs:" + movies.toString());
+                current.favorites = movies;
+                mediatorLiveData.setValue(current);
+            }
+        });
+        return mediatorLiveData;
     }
 
 
@@ -90,7 +104,12 @@ public class MovieRepository {
         return data;
     }
 
+    public LiveData<List<Movie>> getFavorites(){
+        return favs;
+    }
+
     public void insertFavorite(final Movie movie){
+        Log.d("TAG", "insertFavorite: ");
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -100,6 +119,7 @@ public class MovieRepository {
     }
 
     public void deleteFavorite(final Movie movie){
+        Log.d("TAG", "deleteFavorite: ");
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -153,5 +173,43 @@ public class MovieRepository {
         data.setValue(movies);
     }
 
+
+    public class MyTaggedMovies {
+
+        List<Movie> movies;
+        List<Movie> favorites;
+
+        public MyTaggedMovies() {}
+
+        public boolean isComplete() {
+            return (movies != null && favorites != null);
+        }
+
+        public void tagMovies(){
+            for (Movie m: movies){
+                for (Movie f : favorites){
+                    if (m.getId().equals(f.getId())){
+                        m.setFavorite(true);
+                    }
+                }
+            }
+        }
+
+        public List<Movie> getMovies() {
+            return movies;
+        }
+
+        public void setMovies(List<Movie> movies) {
+            this.movies = movies;
+        }
+
+        public List<Movie> getFavorites() {
+            return favorites;
+        }
+
+        public void setFavorites(List<Movie> favorites) {
+            this.favorites = favorites;
+        }
+    }
 
 }

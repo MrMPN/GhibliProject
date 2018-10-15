@@ -21,18 +21,6 @@ public abstract class AppDatabase extends RoomDatabase {
             instance = Room.databaseBuilder(context.getApplicationContext(),
                     AppDatabase.class, "app-database")
                     .fallbackToDestructiveMigration()
-                    .addCallback(new Callback() {
-                        @Override
-                        public void onCreate(@NonNull SupportSQLiteDatabase db) {
-                            super.onCreate(db);
-                            Executors.newSingleThreadExecutor().execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    getInstance(context).movieDao().insert(new Movie("2baf70d1-42bb-4437-b551-e5fed5a87abe", true));
-                                }
-                            });
-                        }
-                    })
                     .build();
         }
         return instance;

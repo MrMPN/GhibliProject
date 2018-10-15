@@ -23,5 +23,4 @@ public class DetailFragmentViewModel extends AndroidViewModel {
         repository.deleteFavorite(movie);
     }
 
-    public void recheckFavorites(){repository.fetchFavorites();}
 }

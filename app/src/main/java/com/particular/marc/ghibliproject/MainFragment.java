@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 
 import com.particular.marc.ghibliproject.RecyclerViewAdapter.ListItemClickListener;
 import com.particular.marc.ghibliproject.model.Movie;
+import com.particular.marc.ghibliproject.repository.MovieRepository;
 import com.particular.marc.ghibliproject.viewmodel.MainFragmentViewModel;
 
 import java.util.List;
@@ -42,16 +44,23 @@ public class MainFragment extends Fragment implements ListItemClickListener {
     public MainFragment() {
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate: ");
+        initViewModel();
+        super.onCreate(savedInstanceState);
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView: ");
         View v = inflater.inflate(R.layout.fragment_main, container, false);
         setHasOptionsMenu(true);
         setRecyclerView(v);
-        initViewModel();
         return v;
     }
+
 
     private void setRecyclerView(View v){
         RecyclerView recyclerView = v.findViewById(R.id.list);
@@ -62,10 +71,22 @@ public class MainFragment extends Fragment implements ListItemClickListener {
 
     private void initViewModel(){
         viewModel = ViewModelProviders.of(this).get(MainFragmentViewModel.class);
-        viewModel.getMovies().observe(this, new Observer<List<Movie>>() {
+//        viewModel.getMovies().observe(this, new Observer<List<Movie>>() {
+//            @Override
+//            public void onChanged(@Nullable List<Movie> movies) {
+//                Log.d(TAG, "getMovies onChanged: " + movies.toString());
+//                //adapter.setMovies(movies);
+//            }
+//        });
+        viewModel.checkSources().observe(this, new Observer<MovieRepository.MyTaggedMovies>() {
             @Override
-            public void onChanged(@Nullable List<Movie> movies) {
-                adapter.setMovies(movies);
+            public void onChanged(@Nullable MovieRepository.MyTaggedMovies myTaggedMovies) {
+                Log.d(TAG, "checkSources: " + myTaggedMovies.isComplete());
+                if (myTaggedMovies.isComplete()){
+                    Log.d("TAG", "TaggedMovies is complete: Tagging movies");
+                    myTaggedMovies.tagMovies();
+                    adapter.setMovies(myTaggedMovies.getMovies());
+                }
             }
         });
     }
