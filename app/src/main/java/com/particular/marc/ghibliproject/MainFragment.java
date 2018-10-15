@@ -1,11 +1,14 @@
 package com.particular.marc.ghibliproject;
 
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,16 +18,9 @@ import android.view.ViewGroup;
 
 import com.particular.marc.ghibliproject.RecyclerViewAdapter.ListItemClickListener;
 import com.particular.marc.ghibliproject.model.Movie;
-import com.particular.marc.ghibliproject.network.ApiRequest;
-import com.particular.marc.ghibliproject.network.RetrofitClientInstance;
+import com.particular.marc.ghibliproject.viewmodel.MainFragmentViewModel;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static com.particular.marc.ghibliproject.DetailFragment.MOVIE_KEY;
 
@@ -34,8 +30,13 @@ import static com.particular.marc.ghibliproject.DetailFragment.MOVIE_KEY;
  */
 public class MainFragment extends Fragment implements ListItemClickListener {
     private static final String TAG = "MainFragment";
-    private RecyclerView recyclerView;
+    public static int ASC = 1;
+    public static int DESC = 2;
+    private static int nameSortOrder = ASC;
+    private static int ratingSortOrder = DESC;
+    private static int yearSortOrder = ASC;
     private RecyclerViewAdapter adapter;
+    private MainFragmentViewModel viewModel;
 
 
     public MainFragment() {
@@ -43,41 +44,28 @@ public class MainFragment extends Fragment implements ListItemClickListener {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
         setHasOptionsMenu(true);
         setRecyclerView(v);
-        getMoviesData();
+        initViewModel();
         return v;
     }
 
     private void setRecyclerView(View v){
-        recyclerView = v.findViewById(R.id.list);
+        RecyclerView recyclerView = v.findViewById(R.id.list);
         adapter = new RecyclerViewAdapter(getContext(), this);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }
 
-    private void getMoviesData(){
-        ApiRequest service = RetrofitClientInstance.getRetrofitInstance().create(ApiRequest.class);
-        Call<List<Movie>> call = service.getAllMovies();
-        call.enqueue(new Callback<List<Movie>>() {
+    private void initViewModel(){
+        viewModel = ViewModelProviders.of(this).get(MainFragmentViewModel.class);
+        viewModel.getMovies().observe(this, new Observer<List<Movie>>() {
             @Override
-            public void onResponse(Call<List<Movie>> call, Response<List<Movie>> response) {
-                List<Movie> list = response.body();
-                Collections.sort(list, new Comparator<Movie>() {
-                    @Override
-                    public int compare(Movie o1, Movie o2) {
-                        return o1.getTitle().compareToIgnoreCase(o2.getTitle());
-                    }
-                });
-                adapter.setMovies(list);
-            }
-
-            @Override
-            public void onFailure(Call<List<Movie>> call, Throwable t) {
-                Log.i(TAG, "onFailure: " + t.getMessage());
+            public void onChanged(@Nullable List<Movie> movies) {
+                adapter.setMovies(movies);
             }
         });
     }
@@ -108,10 +96,16 @@ public class MainFragment extends Fragment implements ListItemClickListener {
             case R.id.go_to_favorite:
                 break;
             case R.id.sort_by_name:
+                viewModel.sortByName(nameSortOrder);
+                nameSortOrder = (nameSortOrder == ASC) ? DESC : ASC;
                 break;
             case R.id.sort_by_rating:
+                viewModel.sortByRating(ratingSortOrder);
+                ratingSortOrder = (ratingSortOrder == ASC) ? DESC : ASC;
                 break;
             case R.id.sort_by_year:
+                viewModel.sortByYear(yearSortOrder);
+                yearSortOrder = (yearSortOrder == ASC) ? DESC : ASC;
                 break;
         }
         return true;

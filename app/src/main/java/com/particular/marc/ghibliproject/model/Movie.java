@@ -1,22 +1,37 @@
 package com.particular.marc.ghibliproject.model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
+@Entity(tableName = "movie")
 public class Movie implements Parcelable {
-    private String id;
+    @PrimaryKey
+    @NonNull private String id;
+
+    @Ignore
     private String title;
+    @Ignore
     private String description;
+    @Ignore
     private String director;
+    @Ignore
     private String producer;
+    @Ignore
     @SerializedName("release_date")
     private int releaseYear;
+    @Ignore
     @SerializedName("rt_score")
     private int score;
+
     private  boolean favorite = false;
 
+    @Ignore
     public Movie(String id, String title, String description, String director, String producer, int releaseYear, int score) {
         this.id = id;
         this.title = title;
@@ -25,6 +40,11 @@ public class Movie implements Parcelable {
         this.producer = producer;
         this.releaseYear = releaseYear;
         this.score = score;
+    }
+
+    public Movie(String id, boolean favorite){
+        this.id = id;
+        this.favorite = favorite;
     }
 
     public String getId() {
@@ -130,4 +150,10 @@ public class Movie implements Parcelable {
             return new Movie[size];
         }
     };
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "ID: " + id + ", Favorite? " + favorite;
+    }
 }

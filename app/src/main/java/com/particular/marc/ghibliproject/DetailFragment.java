@@ -1,7 +1,9 @@
 package com.particular.marc.ghibliproject;
 
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.particular.marc.ghibliproject.model.Movie;
+import com.particular.marc.ghibliproject.viewmodel.DetailFragmentViewModel;
 
 
 /**
@@ -28,13 +31,14 @@ public class DetailFragment extends Fragment {
     TextView producerView;
     TextView scoreView;
     ImageView favoriteView;
+    private DetailFragmentViewModel viewModel;
 
     public DetailFragment() {
     }
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         Bundle arguments = getArguments();
@@ -43,6 +47,7 @@ public class DetailFragment extends Fragment {
         }
         initViews(view);
         setViews();
+        viewModel = ViewModelProviders.of(this).get(DetailFragmentViewModel.class);
 
         return view;
     }
@@ -80,11 +85,21 @@ public class DetailFragment extends Fragment {
 
     private void changeFavoriteStatus(){
         if (favoriteView.getTag().equals(UNLIKE)){
+            movie.setFavorite(true);
+            viewModel.insertFavorite(movie);
             favoriteView.setImageResource(R.drawable.like);
             favoriteView.setTag(LIKE);
         } else if (favoriteView.getTag().equals(LIKE)){
+            movie.setFavorite(false);
+            viewModel.deleteFavorite(movie);
             favoriteView.setImageResource(R.drawable.unlike);
             favoriteView.setTag(UNLIKE);
         }
+    }
+
+    @Override
+    public void onPause() {
+        viewModel.recheckFavorites();
+        super.onPause();
     }
 }
