@@ -20,7 +20,7 @@ import android.view.ViewGroup;
 import com.particular.marc.ghibliproject.RecyclerViewAdapter.ListItemClickListener;
 import com.particular.marc.ghibliproject.model.Movie;
 import com.particular.marc.ghibliproject.repository.MovieRepository;
-import com.particular.marc.ghibliproject.viewmodel.MainFragmentViewModel;
+import com.particular.marc.ghibliproject.viewmodel.MainViewModel;
 
 import java.util.List;
 
@@ -38,17 +38,9 @@ public class MainFragment extends Fragment implements ListItemClickListener {
     private static int ratingSortOrder = DESC;
     private static int yearSortOrder = ASC;
     private RecyclerViewAdapter adapter;
-    private MainFragmentViewModel viewModel;
-
+    private MainViewModel viewModel;
 
     public MainFragment() {
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate: ");
-        initViewModel();
-        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -61,6 +53,11 @@ public class MainFragment extends Fragment implements ListItemClickListener {
         return v;
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        initViewModel();
+    }
 
     private void setRecyclerView(View v){
         RecyclerView recyclerView = v.findViewById(R.id.list);
@@ -70,21 +67,16 @@ public class MainFragment extends Fragment implements ListItemClickListener {
     }
 
     private void initViewModel(){
-        viewModel = ViewModelProviders.of(this).get(MainFragmentViewModel.class);
-//        viewModel.getMovies().observe(this, new Observer<List<Movie>>() {
-//            @Override
-//            public void onChanged(@Nullable List<Movie> movies) {
-//                Log.d(TAG, "getMovies onChanged: " + movies.toString());
-//                //adapter.setMovies(movies);
-//            }
-//        });
-        viewModel.checkSources().observe(this, new Observer<MovieRepository.MyTaggedMovies>() {
+        Log.d(TAG, "initViewModel: ");
+        viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        viewModel.getTagged().observe(getViewLifecycleOwner(), new Observer<MovieRepository.MyTaggedMovies>() {
             @Override
             public void onChanged(@Nullable MovieRepository.MyTaggedMovies myTaggedMovies) {
                 Log.d(TAG, "checkSources: " + myTaggedMovies.isComplete());
                 if (myTaggedMovies.isComplete()){
                     Log.d("TAG", "TaggedMovies is complete: Tagging movies");
                     myTaggedMovies.tagMovies();
+                    Log.d(TAG, "onChanged: adapter set");
                     adapter.setMovies(myTaggedMovies.getMovies());
                 }
             }

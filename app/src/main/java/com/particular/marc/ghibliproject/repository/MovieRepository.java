@@ -34,6 +34,7 @@ public class MovieRepository {
     private static MovieRepository instance;
     private final MutableLiveData<List<Movie>> data = new MutableLiveData<>();
     private final MutableLiveData<List<Movie>> favs = new MutableLiveData<>();
+    private final MediatorLiveData<MyTaggedMovies> tagged = new MediatorLiveData<>();
     private AppExecutors mExecutors = AppExecutors.getInstance();
 
     public static synchronized MovieRepository getInstance(Application application){
@@ -50,6 +51,7 @@ public class MovieRepository {
         movieDao = db.movieDao();
         fetchMovies();
         fetchFavorites();
+        checkSources();
     }
 
     private void fetchMovies(){
@@ -77,26 +79,25 @@ public class MovieRepository {
         });
     }
 
-    public MediatorLiveData<MyTaggedMovies> checkSources(){
-        final MediatorLiveData<MyTaggedMovies> mediatorLiveData = new MediatorLiveData<>();
+    public void checkSources(){
+        Log.d(TAG, "checkSources: ");
         final MyTaggedMovies current = new MyTaggedMovies();
-        mediatorLiveData.addSource(data, new Observer<List<Movie>>() {
+        tagged.addSource(data, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
-                //Log.d("TAG", "Mediator on Changed data:" + movies.toString());
+                Log.d(TAG, "Mediator on Changed data:" + movies.toString());
                 current.movies = movies;
-                mediatorLiveData.setValue(current);
+                tagged.setValue(current);
             }
         });
-        mediatorLiveData.addSource(favs, new Observer<List<Movie>>() {
+        tagged.addSource(favs, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
-                Log.d("TAG", "Mediator on Changed favs:" + movies.toString());
+                Log.d(TAG, "Mediator on Changed favs:" + movies.toString());
                 current.favorites = movies;
-                mediatorLiveData.setValue(current);
+                tagged.setValue(current);
             }
         });
-        return mediatorLiveData;
     }
 
 
@@ -108,8 +109,10 @@ public class MovieRepository {
         return favs;
     }
 
+    public MediatorLiveData<MyTaggedMovies> getTagged(){
+        return tagged;}
+
     public void insertFavorite(final Movie movie){
-        Log.d("TAG", "insertFavorite: ");
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -119,7 +122,6 @@ public class MovieRepository {
     }
 
     public void deleteFavorite(final Movie movie){
-        Log.d("TAG", "deleteFavorite: ");
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {

@@ -48,7 +48,7 @@ public class DetailFragment extends Fragment {
         }
         initViews(view);
         setViews();
-        viewModel = ViewModelProviders.of(this).get(DetailFragmentViewModel.class);
+        viewModel = ViewModelProviders.of(getActivity()).get(DetailFragmentViewModel.class);
 
         return view;
     }
