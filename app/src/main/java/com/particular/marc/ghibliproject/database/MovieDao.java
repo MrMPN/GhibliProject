@@ -1,5 +1,6 @@
 package com.particular.marc.ghibliproject.database;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
@@ -24,5 +25,5 @@ public interface MovieDao {
     void update(Movie movie);
 
     @Query("SELECT * FROM movie")
-    List<Movie> getFavorites();
+    LiveData<List<Movie>> getFavorites();
 }

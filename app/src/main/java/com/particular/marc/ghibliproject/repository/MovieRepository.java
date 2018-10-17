@@ -33,12 +33,12 @@ public class MovieRepository {
     private MovieDao movieDao;
     private static MovieRepository instance;
     private final MutableLiveData<List<Movie>> data = new MutableLiveData<>();
-    private final MutableLiveData<List<Movie>> favs = new MutableLiveData<>();
-    private final MediatorLiveData<MyTaggedMovies> tagged = new MediatorLiveData<>();
+    private LiveData<List<Movie>> favs;
     private AppExecutors mExecutors = AppExecutors.getInstance();
 
     public static synchronized MovieRepository getInstance(Application application){
         if (instance == null){
+            Log.d(TAG, "getInstance: new Instance");
             instance = new MovieRepository(application);
         }
         return instance;
@@ -50,8 +50,7 @@ public class MovieRepository {
         service = RetrofitClientInstance.getRetrofitInstance().create(ApiRequest.class);
         movieDao = db.movieDao();
         fetchMovies();
-        fetchFavorites();
-        checkSources();
+        favs = movieDao.getFavorites();
     }
 
     private void fetchMovies(){
@@ -59,6 +58,7 @@ public class MovieRepository {
         call.enqueue(new Callback<List<Movie>>() {
             @Override
             public void onResponse(@NonNull Call<List<Movie>> call, @NonNull Response<List<Movie>> response) {
+                Log.d(TAG, "onResponse:");
                 List<Movie> list = response.body();
                 data.setValue(list);
             }
@@ -70,37 +70,6 @@ public class MovieRepository {
         });
     }
 
-    public void fetchFavorites(){
-        mExecutors.diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                favs.postValue(movieDao.getFavorites());
-            }
-        });
-    }
-
-    public void checkSources(){
-        Log.d(TAG, "checkSources: ");
-        final MyTaggedMovies current = new MyTaggedMovies();
-        tagged.addSource(data, new Observer<List<Movie>>() {
-            @Override
-            public void onChanged(@Nullable List<Movie> movies) {
-                Log.d(TAG, "Mediator on Changed data:" + movies.toString());
-                current.movies = movies;
-                tagged.setValue(current);
-            }
-        });
-        tagged.addSource(favs, new Observer<List<Movie>>() {
-            @Override
-            public void onChanged(@Nullable List<Movie> movies) {
-                Log.d(TAG, "Mediator on Changed favs:" + movies.toString());
-                current.favorites = movies;
-                tagged.setValue(current);
-            }
-        });
-    }
-
-
     public LiveData<List<Movie>> getMovies(){
         return data;
     }
@@ -108,9 +77,6 @@ public class MovieRepository {
     public LiveData<List<Movie>> getFavorites(){
         return favs;
     }
-
-    public MediatorLiveData<MyTaggedMovies> getTagged(){
-        return tagged;}
 
     public void insertFavorite(final Movie movie){
         mExecutors.diskIO().execute(new Runnable() {
@@ -122,6 +88,7 @@ public class MovieRepository {
     }
 
     public void deleteFavorite(final Movie movie){
+        Log.d(TAG, "deleteFavorite: ");
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -175,43 +142,5 @@ public class MovieRepository {
         data.setValue(movies);
     }
 
-
-    public class MyTaggedMovies {
-
-        List<Movie> movies;
-        List<Movie> favorites;
-
-        public MyTaggedMovies() {}
-
-        public boolean isComplete() {
-            return (movies != null && favorites != null);
-        }
-
-        public void tagMovies(){
-            for (Movie m: movies){
-                for (Movie f : favorites){
-                    if (m.getId().equals(f.getId())){
-                        m.setFavorite(true);
-                    }
-                }
-            }
-        }
-
-        public List<Movie> getMovies() {
-            return movies;
-        }
-
-        public void setMovies(List<Movie> movies) {
-            this.movies = movies;
-        }
-
-        public List<Movie> getFavorites() {
-            return favorites;
-        }
-
-        public void setFavorites(List<Movie> favorites) {
-            this.favorites = favorites;
-        }
-    }
 
 }

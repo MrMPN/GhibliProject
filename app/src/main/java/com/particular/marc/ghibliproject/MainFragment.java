@@ -46,7 +46,6 @@ public class MainFragment extends Fragment implements ListItemClickListener {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView: ");
         View v = inflater.inflate(R.layout.fragment_main, container, false);
         setHasOptionsMenu(true);
         setRecyclerView(v);
@@ -69,16 +68,11 @@ public class MainFragment extends Fragment implements ListItemClickListener {
     private void initViewModel(){
         Log.d(TAG, "initViewModel: ");
         viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        viewModel.getTagged().observe(getViewLifecycleOwner(), new Observer<MovieRepository.MyTaggedMovies>() {
+        viewModel.getTagged().observe(getViewLifecycleOwner(), new Observer<MainViewModel.MyTaggedMovies>() {
             @Override
-            public void onChanged(@Nullable MovieRepository.MyTaggedMovies myTaggedMovies) {
-                Log.d(TAG, "checkSources: " + myTaggedMovies.isComplete());
-                if (myTaggedMovies.isComplete()){
-                    Log.d("TAG", "TaggedMovies is complete: Tagging movies");
-                    myTaggedMovies.tagMovies();
-                    Log.d(TAG, "onChanged: adapter set");
-                    adapter.setMovies(myTaggedMovies.getMovies());
-                }
+            public void onChanged(@Nullable MainViewModel.MyTaggedMovies myTaggedMovies) {
+                Log.d(TAG, "onChanged: myTaggedMovies");
+                adapter.swap(myTaggedMovies.getMovies());
             }
         });
     }

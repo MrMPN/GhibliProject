@@ -21,20 +21,29 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     final private ListItemClickListener mOnClickListener;
     private List<Movie> mMovies;
     private LayoutInflater inflater;
-    private Context mContext;
 
     public interface ListItemClickListener{
         void onListItemClick (Movie clickedItem);
     }
 
     RecyclerViewAdapter(Context mContext, ListItemClickListener listener) {
-        this.mContext = mContext;
         mOnClickListener = listener;
         inflater = LayoutInflater.from(mContext);
     }
 
     void setMovies(List<Movie> movies){
         mMovies = movies;
+        notifyDataSetChanged();
+    }
+
+    public void swap(List<Movie> movies) {
+        if (mMovies != null) {
+            mMovies = null;
+            mMovies = movies;
+        }
+        else {
+            mMovies = movies;
+        }
         notifyDataSetChanged();
     }
 
