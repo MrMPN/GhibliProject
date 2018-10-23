@@ -1,4 +1,4 @@
-package com.particular.marc.ghibliproject;
+package com.particular.marc.ghibliproject.fragment;
 
 
 import android.arch.lifecycle.Observer;
@@ -17,14 +17,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.particular.marc.ghibliproject.R;
+import com.particular.marc.ghibliproject.RecyclerViewAdapter;
 import com.particular.marc.ghibliproject.RecyclerViewAdapter.ListItemClickListener;
 import com.particular.marc.ghibliproject.model.Movie;
-import com.particular.marc.ghibliproject.repository.MovieRepository;
 import com.particular.marc.ghibliproject.viewmodel.MainViewModel;
 
 import java.util.List;
 
-import static com.particular.marc.ghibliproject.DetailFragment.MOVIE_KEY;
+import static com.particular.marc.ghibliproject.fragment.DetailFragment.MOVIE_KEY;
 
 
 /**
@@ -32,9 +33,8 @@ import static com.particular.marc.ghibliproject.DetailFragment.MOVIE_KEY;
  */
 public class MainFragment extends Fragment implements ListItemClickListener {
     private static final String TAG = "MainFragment";
-    public static int ASC = 1;
-    public static int DESC = 2;
-    private static int nameSortOrder = ASC;
+    public static int ASC = 0;
+    public static int DESC = 1;
     private static int ratingSortOrder = DESC;
     private static int yearSortOrder = ASC;
     private RecyclerViewAdapter adapter;
@@ -68,11 +68,11 @@ public class MainFragment extends Fragment implements ListItemClickListener {
     private void initViewModel(){
         Log.d(TAG, "initViewModel: ");
         viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        viewModel.getTagged().observe(getViewLifecycleOwner(), new Observer<MainViewModel.MyTaggedMovies>() {
+        viewModel.getMoviesFiltered().observe(getViewLifecycleOwner(), new Observer<List<Movie>>() {
             @Override
-            public void onChanged(@Nullable MainViewModel.MyTaggedMovies myTaggedMovies) {
-                Log.d(TAG, "onChanged: myTaggedMovies");
-                adapter.swap(myTaggedMovies.getMovies());
+            public void onChanged(@Nullable List<Movie> movies) {
+                Log.d(TAG, "onChanged: ");
+                adapter.swap(movies);
             }
         });
     }
@@ -103,15 +103,13 @@ public class MainFragment extends Fragment implements ListItemClickListener {
             case R.id.go_to_favorite:
                 break;
             case R.id.sort_by_name:
-                viewModel.sortByName(nameSortOrder);
-                nameSortOrder = (nameSortOrder == ASC) ? DESC : ASC;
+                int nameSortOrder = (viewModel.getFilter() == ASC) ? DESC : ASC;
+                viewModel.changeFilter(nameSortOrder);
                 break;
             case R.id.sort_by_rating:
-                viewModel.sortByRating(ratingSortOrder);
                 ratingSortOrder = (ratingSortOrder == ASC) ? DESC : ASC;
                 break;
             case R.id.sort_by_year:
-                viewModel.sortByYear(yearSortOrder);
                 yearSortOrder = (yearSortOrder == ASC) ? DESC : ASC;
                 break;
         }

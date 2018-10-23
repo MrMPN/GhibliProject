@@ -7,32 +7,35 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 @Entity(tableName = "movie")
 public class Movie implements Parcelable {
+    @Expose
     @PrimaryKey
     @NonNull private String id;
 
-    @Ignore
+    @Expose
     private String title;
-    @Ignore
+    @Expose
     private String description;
-    @Ignore
+    @Expose
     private String director;
-    @Ignore
+    @Expose
     private String producer;
-    @Ignore
+    @Expose
     @SerializedName("release_date")
     private int releaseYear;
-    @Ignore
+    @Expose
     @SerializedName("rt_score")
     private int score;
 
     private  boolean favorite = false;
 
     @Ignore
-    public Movie(String id, String title, String description, String director, String producer, int releaseYear, int score) {
+    public Movie(String id, String title, String description, String director, String producer,
+                 int releaseYear, int score) {
         this.id = id;
         this.title = title;
         this.description = description;

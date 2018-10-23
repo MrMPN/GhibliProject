@@ -26,7 +26,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         void onListItemClick (Movie clickedItem);
     }
 
-    RecyclerViewAdapter(Context mContext, ListItemClickListener listener) {
+    public RecyclerViewAdapter(Context mContext, ListItemClickListener listener) {
         mOnClickListener = listener;
         inflater = LayoutInflater.from(mContext);
     }

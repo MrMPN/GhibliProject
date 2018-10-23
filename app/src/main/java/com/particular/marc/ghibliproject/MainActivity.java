@@ -3,6 +3,8 @@ package com.particular.marc.ghibliproject;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.particular.marc.ghibliproject.fragment.MainFragment;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override

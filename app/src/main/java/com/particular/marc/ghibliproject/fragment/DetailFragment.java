@@ -1,17 +1,17 @@
-package com.particular.marc.ghibliproject;
+package com.particular.marc.ghibliproject.fragment;
 
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.particular.marc.ghibliproject.R;
 import com.particular.marc.ghibliproject.model.Movie;
 import com.particular.marc.ghibliproject.viewmodel.DetailFragmentViewModel;
 
@@ -87,7 +87,7 @@ public class DetailFragment extends Fragment {
     private void changeFavoriteStatus(){
         if (favoriteView.getTag().equals(UNLIKE)){
             movie.setFavorite(true);
-            viewModel.insertFavorite(movie);
+            viewModel.tagAsFavorite(movie);
             favoriteView.setImageResource(R.drawable.like);
             favoriteView.setTag(LIKE);
         } else if (favoriteView.getTag().equals(LIKE)){

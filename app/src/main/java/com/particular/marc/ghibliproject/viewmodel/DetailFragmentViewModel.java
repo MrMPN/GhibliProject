@@ -17,9 +17,9 @@ public class DetailFragmentViewModel extends AndroidViewModel {
         repository = MovieRepository.getInstance(application);
     }
 
-    public void insertFavorite(Movie movie){
-        Log.d(TAG, "insertFavorite: ");
-        repository.insertFavorite(movie);
+    public void tagAsFavorite(Movie movie){
+        Log.d(TAG, "tagAsFavorite: ");
+        repository.tagAsFavorite(movie);
     }
 
     public void deleteFavorite(Movie movie){

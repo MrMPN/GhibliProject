@@ -1,4 +1,4 @@
-package com.particular.marc.ghibliproject;
+package com.particular.marc.ghibliproject.helper;
 
 import android.os.Handler;
 import android.os.Looper;
