@@ -4,6 +4,7 @@ package com.particular.marc.ghibliproject.fragment;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +14,7 @@ import android.widget.TextView;
 
 import com.particular.marc.ghibliproject.R;
 import com.particular.marc.ghibliproject.model.Movie;
-import com.particular.marc.ghibliproject.viewmodel.DetailFragmentViewModel;
+import com.particular.marc.ghibliproject.viewmodel.MainViewModel;
 
 
 /**
@@ -21,9 +22,9 @@ import com.particular.marc.ghibliproject.viewmodel.DetailFragmentViewModel;
  */
 public class DetailFragment extends Fragment {
     private static final String TAG = "DetailFragment";
-    public static final String MOVIE_KEY = "movie_key";
     private static final int UNLIKE = 1;
     private static final int LIKE = 2;
+    private MainViewModel viewModel;
     private Movie movie;
     TextView titleView;
     TextView yearView;
@@ -32,7 +33,7 @@ public class DetailFragment extends Fragment {
     TextView producerView;
     TextView scoreView;
     ImageView favoriteView;
-    private DetailFragmentViewModel viewModel;
+
 
     public DetailFragment() {
     }
@@ -42,15 +43,16 @@ public class DetailFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            movie = arguments.getParcelable(MOVIE_KEY);
-        }
         initViews(view);
-        setViews();
-        viewModel = ViewModelProviders.of(getActivity()).get(DetailFragmentViewModel.class);
-
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        movie = viewModel.getSelectedMovie();
+        setViews();
     }
 
     private void initViews(View view){
@@ -70,32 +72,25 @@ public class DetailFragment extends Fragment {
         directorView.setText(movie.getDirector());
         producerView.setText(movie.getProducer());
         scoreView.setText(String.valueOf(movie.getScore()));
-        favoriteView.setTag(UNLIKE);
         if (movie.isFavorite()){
             favoriteView.setImageResource(R.drawable.like);
-            favoriteView.setTag(LIKE);
         }
-
-        favoriteView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                changeFavoriteStatus();
-            }
-        });
+        favoriteView.setOnClickListener(v -> changeFavoriteStatus());
     }
 
     private void changeFavoriteStatus(){
-        if (favoriteView.getTag().equals(UNLIKE)){
-            movie.setFavorite(true);
-            viewModel.tagAsFavorite(movie);
-            favoriteView.setImageResource(R.drawable.like);
-            favoriteView.setTag(LIKE);
-        } else if (favoriteView.getTag().equals(LIKE)){
+        if (movie.isFavorite()){
             movie.setFavorite(false);
-            viewModel.deleteFavorite(movie);
             favoriteView.setImageResource(R.drawable.unlike);
-            favoriteView.setTag(UNLIKE);
+        } else {
+            movie.setFavorite(true);
+            favoriteView.setImageResource(R.drawable.like);
         }
     }
-    
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        viewModel.saveFavoriteStatus(movie);
+    }
 }

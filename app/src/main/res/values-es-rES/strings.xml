@@ -3,4 +3,5 @@
     <string name="director">Director:</string>
     <string name="producer">Productor:</string>
     <string name="year_of_release">Año de salida:</string>
+    <string name="app_name">Proyecto Ghibli</string>
 </resources>

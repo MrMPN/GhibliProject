@@ -1,6 +1,10 @@
 <resources>
-    <string name="app_name" translatable="false">Ghibli Project</string>
+    <string name="app_name">Ghibli Project</string>
     <string name="director">Director:</string>
     <string name="producer">Producer:</string>
     <string name="year_of_release">Year of release:</string>
+    <string name="sort_by_name_key" translatable="false">sort_by_name_key</string>
+    <string name="sort_by_rating_key" translatable="false">sort_by_rating_key</string>
+    <string name="sort_by_year_key" translatable="false">sort_by_year_key</string>
+    <string name="preference_file_key" translatable="false">preference_file_key</string>
 </resources>

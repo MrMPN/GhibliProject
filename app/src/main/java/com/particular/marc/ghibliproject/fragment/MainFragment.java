@@ -3,6 +3,8 @@ package com.particular.marc.ghibliproject.fragment;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,12 +22,14 @@ import android.view.ViewGroup;
 import com.particular.marc.ghibliproject.R;
 import com.particular.marc.ghibliproject.RecyclerViewAdapter;
 import com.particular.marc.ghibliproject.RecyclerViewAdapter.ListItemClickListener;
+import com.particular.marc.ghibliproject.helper.MovieComparatorHelper;
 import com.particular.marc.ghibliproject.model.Movie;
 import com.particular.marc.ghibliproject.viewmodel.MainViewModel;
 
 import java.util.List;
 
-import static com.particular.marc.ghibliproject.fragment.DetailFragment.MOVIE_KEY;
+import static com.particular.marc.ghibliproject.helper.MovieComparatorHelper.ASC;
+import static com.particular.marc.ghibliproject.helper.MovieComparatorHelper.DESC;
 
 
 /**
@@ -33,10 +37,6 @@ import static com.particular.marc.ghibliproject.fragment.DetailFragment.MOVIE_KE
  */
 public class MainFragment extends Fragment implements ListItemClickListener {
     private static final String TAG = "MainFragment";
-    public static int ASC = 0;
-    public static int DESC = 1;
-    private static int ratingSortOrder = DESC;
-    private static int yearSortOrder = ASC;
     private RecyclerViewAdapter adapter;
     private MainViewModel viewModel;
 
@@ -66,23 +66,21 @@ public class MainFragment extends Fragment implements ListItemClickListener {
     }
 
     private void initViewModel(){
-        Log.d(TAG, "initViewModel: ");
         viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         viewModel.getMoviesFiltered().observe(getViewLifecycleOwner(), new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
-                Log.d(TAG, "onChanged: ");
+                Log.d(TAG, "onChanged: LiveData changed");
                 adapter.swap(movies);
             }
         });
     }
 
+
     @Override
     public void onListItemClick(Movie clickedItem) {
-        Bundle arguments = new Bundle();
-        arguments.putParcelable(MOVIE_KEY, clickedItem);
+        viewModel.setSelectedMovie(clickedItem);
         DetailFragment fragment = new DetailFragment();
-        fragment.setArguments(arguments);
         getFragmentManager()
                 .beginTransaction()
                 .addToBackStack(null)
@@ -97,22 +95,35 @@ public class MainFragment extends Fragment implements ListItemClickListener {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        SharedPreferences sharedPreferences = getContext().getSharedPreferences(
+                getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
         switch (item.getItemId()){
             case R.id.search:
                 break;
             case R.id.go_to_favorite:
                 break;
             case R.id.sort_by_name:
-                int nameSortOrder = (viewModel.getFilter() == ASC) ? DESC : ASC;
-                viewModel.changeFilter(nameSortOrder);
+                int nameSortOrder = sharedPreferences.getInt(getString(R.string.sort_by_name_key), ASC);
+                nameSortOrder = (nameSortOrder == ASC) ? DESC : ASC;
+                viewModel.filterBy(MovieComparatorHelper.BY_NAME ,nameSortOrder);
+                editor.putInt(getString(R.string.sort_by_name_key), nameSortOrder);
                 break;
             case R.id.sort_by_rating:
+                int ratingSortOrder = sharedPreferences.getInt(getString(R.string.sort_by_rating_key), DESC);
+                viewModel.filterBy(MovieComparatorHelper.BY_RATING ,ratingSortOrder);
                 ratingSortOrder = (ratingSortOrder == ASC) ? DESC : ASC;
+                editor.putInt(getString(R.string.sort_by_rating_key), ratingSortOrder);
                 break;
             case R.id.sort_by_year:
+                int yearSortOrder = sharedPreferences.getInt(getString(R.string.sort_by_year_key), ASC);
+                viewModel.filterBy(MovieComparatorHelper.BY_YEAR ,yearSortOrder);
                 yearSortOrder = (yearSortOrder == ASC) ? DESC : ASC;
+                editor.putInt(getString(R.string.sort_by_year_key), yearSortOrder);
                 break;
         }
+        editor.apply();
         return true;
     }
 }

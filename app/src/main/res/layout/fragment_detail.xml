@@ -8,9 +8,9 @@
 
     <ImageView
         android:id="@+id/cover"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="24dp"
+        android:layout_width="175dp"
+        android:layout_height="175dp"
+        android:layout_marginTop="16dp"
         android:scaleType="fitCenter"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -19,12 +19,13 @@
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
         android:textAppearance="@android:style/TextAppearance.Material.Title"
         android:textSize="24sp"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cover"
         tools:text="Mononoke Hime" />
@@ -59,6 +60,14 @@
         app:layout_constraintStart_toEndOf="@+id/textView"
         app:layout_constraintTop_toTopOf="@+id/textView"
         tools:text="1997" />
+
+    <android.support.constraint.Barrier
+        android:id="@+id/barrier"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:barrierDirection="right"
+        app:constraint_referenced_ids="description"
+        tools:layout_editor_absoluteX="368dp" />
 
     <TextView
         android:id="@+id/description"
@@ -129,9 +138,18 @@
         android:id="@+id/favorite"
         android:layout_width="25dp"
         android:layout_height="25dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"
         android:src="@drawable/unlike"
         app:layout_constraintBottom_toBottomOf="@+id/title"
-        app:layout_constraintStart_toEndOf="@+id/title"
+        app:layout_constraintEnd_toEndOf="@id/barrier"
+        app:layout_constraintEnd_toStartOf="@+id/barrier"
         app:layout_constraintTop_toTopOf="@+id/title" />
+
+    <android.support.constraint.Group
+        android:id="@+id/group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@id/barrier"
+        app:constraint_referenced_ids="title,favorite" />
+
 </android.support.constraint.ConstraintLayout>

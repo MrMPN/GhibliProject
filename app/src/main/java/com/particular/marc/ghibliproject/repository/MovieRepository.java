@@ -72,17 +72,7 @@ public class MovieRepository {
     }
 
 
-    public void tagAsFavorite(final Movie movie){
-        mExecutors.diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                movieDao.update(movie);
-            }
-        });
-    }
-
-    public void deleteFavorite(final Movie movie){
-        Log.d(TAG, "deleteFavorite: ");
+    public void saveFavoriteStatus(final Movie movie){
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
