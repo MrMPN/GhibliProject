@@ -7,4 +7,7 @@
     <string name="sort_by_rating_key" translatable="false">sort_by_rating_key</string>
     <string name="sort_by_year_key" translatable="false">sort_by_year_key</string>
     <string name="preference_file_key" translatable="false">preference_file_key</string>
+    <string name="your_favorites">Your Favorites</string>
+    <string name="details">Details</string>
+    <string name="favorite_status">Favorite Status of the movie</string>
 </resources>

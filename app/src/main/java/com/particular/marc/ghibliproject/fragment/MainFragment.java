@@ -49,6 +49,7 @@ public class MainFragment extends Fragment implements ListItemClickListener {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
         setHasOptionsMenu(true);
         setRecyclerView(v);
+        getActivity().setTitle(R.string.app_name);
         return v;
     }
 
@@ -88,6 +89,8 @@ public class MainFragment extends Fragment implements ListItemClickListener {
                 .commit();
     }
 
+
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu, menu);
@@ -103,24 +106,27 @@ public class MainFragment extends Fragment implements ListItemClickListener {
             case R.id.search:
                 break;
             case R.id.go_to_favorite:
+                FavoriteFragment fragment = new FavoriteFragment();
+                getFragmentManager()
+                        .beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.container, fragment)
+                        .commit();
                 break;
             case R.id.sort_by_name:
                 int nameSortOrder = sharedPreferences.getInt(getString(R.string.sort_by_name_key), ASC);
                 nameSortOrder = (nameSortOrder == ASC) ? DESC : ASC;
-                viewModel.filterBy(MovieComparatorHelper.BY_NAME ,nameSortOrder);
+                viewModel.filterBy("by_name");
                 editor.putInt(getString(R.string.sort_by_name_key), nameSortOrder);
                 break;
             case R.id.sort_by_rating:
                 int ratingSortOrder = sharedPreferences.getInt(getString(R.string.sort_by_rating_key), DESC);
-                viewModel.filterBy(MovieComparatorHelper.BY_RATING ,ratingSortOrder);
+                viewModel.filterBy("by_rating");
                 ratingSortOrder = (ratingSortOrder == ASC) ? DESC : ASC;
                 editor.putInt(getString(R.string.sort_by_rating_key), ratingSortOrder);
                 break;
             case R.id.sort_by_year:
-                int yearSortOrder = sharedPreferences.getInt(getString(R.string.sort_by_year_key), ASC);
-                viewModel.filterBy(MovieComparatorHelper.BY_YEAR ,yearSortOrder);
-                yearSortOrder = (yearSortOrder == ASC) ? DESC : ASC;
-                editor.putInt(getString(R.string.sort_by_year_key), yearSortOrder);
+                viewModel.filterBy("Arrietty");
                 break;
         }
         editor.apply();

@@ -7,22 +7,30 @@ import com.particular.marc.ghibliproject.model.Movie;
 
 import java.util.Comparator;
 
+import static com.particular.marc.ghibliproject.viewmodel.MainViewModel.BY_NAME;
+import static com.particular.marc.ghibliproject.viewmodel.MainViewModel.BY_RATING;
+import static com.particular.marc.ghibliproject.viewmodel.MainViewModel.BY_YEAR;
+
 public class MovieComparatorHelper implements Comparator<Movie> {
     private static final String TAG = "MovieComparatorHelper";
-    public static final int BY_NAME = 11;
-    public static final int BY_RATING = 12;
-    public static final int BY_YEAR = 13;
     public static final int ASC = 0;
     public static final int DESC = 1;
-    private int filter;
+    private String filter;
     private int order;
 
-    public MovieComparatorHelper(Pair<Integer,Integer> args) {
-        if (args != null && args.first != null && args.second != null){
-            this.filter = args.first;
-            this.order = args.second;
+    public MovieComparatorHelper(String filter) {
+        if (filter != null){
+            this.filter = filter;
         }
     }
+
+//    public MovieComparatorHelper(String filter, int order) {
+//        if (args != null && args.first != null && args.second != null){
+//            this.filter = args.first;
+//            this.order = args.second;
+//        }
+//    }
+
 
     @Override
     public int compare(Movie o1, Movie o2) {

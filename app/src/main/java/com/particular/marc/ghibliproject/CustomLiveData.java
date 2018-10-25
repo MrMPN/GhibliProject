@@ -11,10 +11,10 @@ import com.particular.marc.ghibliproject.model.Movie;
 
 import java.util.List;
 
-public class CustomLiveData extends MediatorLiveData<Pair<List<Movie>, Pair<Integer,Integer>>>{
+public class CustomLiveData extends MediatorLiveData<Pair<List<Movie>, String>>{
     private static final String TAG = "CustomLiveData";
 
-    public CustomLiveData(LiveData<List<Movie>> moviesToUse, LiveData<Pair<Integer,Integer>> filterToUse) {
+    public CustomLiveData(LiveData<List<Movie>> moviesToUse, LiveData<String> filterToUse) {
         addSource(moviesToUse, new Observer<List<Movie>>() {
             @Override
             public void onChanged(@Nullable List<Movie> movies) {
@@ -22,9 +22,9 @@ public class CustomLiveData extends MediatorLiveData<Pair<List<Movie>, Pair<Inte
                 setValue(Pair.create(movies, filterToUse.getValue()));
             }
         });
-        addSource(filterToUse, new Observer<Pair<Integer,Integer>>() {
+        addSource(filterToUse, new Observer<String>() {
             @Override
-            public void onChanged(@Nullable Pair<Integer,Integer> filter) {
+            public void onChanged(@Nullable String filter) {
                 Log.d(TAG, "onChanged: " + moviesToUse.getValue());
                 setValue(Pair.create(moviesToUse.getValue(), filter));
             }

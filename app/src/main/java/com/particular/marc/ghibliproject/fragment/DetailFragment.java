@@ -22,8 +22,6 @@ import com.particular.marc.ghibliproject.viewmodel.MainViewModel;
  */
 public class DetailFragment extends Fragment {
     private static final String TAG = "DetailFragment";
-    private static final int UNLIKE = 1;
-    private static final int LIKE = 2;
     private MainViewModel viewModel;
     private Movie movie;
     TextView titleView;
@@ -44,6 +42,7 @@ public class DetailFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
         initViews(view);
+        getActivity().setTitle(R.string.details);
         return view;
     }
 

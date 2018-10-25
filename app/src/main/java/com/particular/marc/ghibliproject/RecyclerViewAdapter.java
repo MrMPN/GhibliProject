@@ -69,6 +69,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     private void setViews(ViewHolder holder, Movie movie){
         holder.titleTextView.setText(movie.getTitle());
         holder.releaseDate.setText(String.valueOf(movie.getReleaseYear()));
+        holder.score.setText(String.valueOf(movie.getScore()));
         if (movie.isFavorite()){ holder.favorite.setVisibility(View.VISIBLE); }
     }
 
@@ -80,19 +81,17 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     class ViewHolder extends RecyclerView.ViewHolder implements OnClickListener {
-        ImageView cover;
+        TextView score;
         ImageView favorite;
         TextView titleTextView;
         TextView releaseDate;
-        ConstraintLayout parentLayout;
 
         ViewHolder(View itemView) {
             super(itemView);
-            cover = itemView.findViewById(R.id.listCover);
-            favorite = itemView.findViewById(R.id.listFavorite);
-            parentLayout = itemView.findViewById(R.id.item_parent);
-            titleTextView = itemView.findViewById(R.id.listTitle);
-            releaseDate = itemView.findViewById(R.id.listYear);
+            score = itemView.findViewById(R.id.list_score);
+            favorite = itemView.findViewById(R.id.list_favorite);
+            titleTextView = itemView.findViewById(R.id.list_title);
+            releaseDate = itemView.findViewById(R.id.list_year);
             itemView.setOnClickListener(this);
         }
 
