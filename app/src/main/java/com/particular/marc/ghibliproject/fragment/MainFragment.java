@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,7 +23,6 @@ import android.view.ViewGroup;
 import com.particular.marc.ghibliproject.R;
 import com.particular.marc.ghibliproject.RecyclerViewAdapter;
 import com.particular.marc.ghibliproject.RecyclerViewAdapter.ListItemClickListener;
-import com.particular.marc.ghibliproject.helper.MovieComparatorHelper;
 import com.particular.marc.ghibliproject.model.Movie;
 import com.particular.marc.ghibliproject.viewmodel.MainViewModel;
 
@@ -94,6 +94,23 @@ public class MainFragment extends Fragment implements ListItemClickListener {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu, menu);
+        MenuItem item = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) item.getActionView();
+        searchView.setOnQueryTextListener(new SearchOnQueryTextListener());
+    }
+
+    private class SearchOnQueryTextListener implements SearchView.OnQueryTextListener {
+
+        @Override
+        public boolean onQueryTextSubmit(String s) {
+            return false;
+        }
+
+        @Override
+        public boolean onQueryTextChange(String query) {
+            viewModel.filterBy(query);
+            return false;
+        }
     }
 
     @Override
@@ -103,30 +120,20 @@ public class MainFragment extends Fragment implements ListItemClickListener {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         switch (item.getItemId()){
-            case R.id.search:
-                break;
             case R.id.go_to_favorite:
-                FavoriteFragment fragment = new FavoriteFragment();
-                getFragmentManager()
-                        .beginTransaction()
-                        .addToBackStack(null)
-                        .replace(R.id.container, fragment)
-                        .commit();
+                viewModel.filterBy(MainViewModel.FAVORITES);
                 break;
             case R.id.sort_by_name:
                 int nameSortOrder = sharedPreferences.getInt(getString(R.string.sort_by_name_key), ASC);
                 nameSortOrder = (nameSortOrder == ASC) ? DESC : ASC;
-                viewModel.filterBy("by_name");
+                viewModel.filterBy(MainViewModel.BY_NAME);
                 editor.putInt(getString(R.string.sort_by_name_key), nameSortOrder);
                 break;
             case R.id.sort_by_rating:
-                int ratingSortOrder = sharedPreferences.getInt(getString(R.string.sort_by_rating_key), DESC);
-                viewModel.filterBy("by_rating");
-                ratingSortOrder = (ratingSortOrder == ASC) ? DESC : ASC;
-                editor.putInt(getString(R.string.sort_by_rating_key), ratingSortOrder);
+                viewModel.filterBy(MainViewModel.BY_RATING);
                 break;
             case R.id.sort_by_year:
-                viewModel.filterBy("Arrietty");
+                viewModel.filterBy(MainViewModel.BY_YEAR);
                 break;
         }
         editor.apply();

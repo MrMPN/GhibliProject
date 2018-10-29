@@ -27,4 +27,24 @@ public interface MovieDao {
 
     @Query("SELECT * FROM movie")
     LiveData<List<Movie>> getMovies();
+
+
+    //FILTER queries
+    @Query("SELECT * FROM movie ORDER BY " +
+            "CASE WHEN :sort = 'by_name' THEN title " +
+            "WHEN :sort = 'by_year' THEN releaseYear " +
+            "WHEN :sort = 'by_rating' THEN score END ASC")
+    LiveData<List<Movie>> sortMovies(String sort);
+
+    @Query ("SELECT * FROM movie WHERE favorite = 1")
+    LiveData<List<Movie>> getFavorites();
+
+
+    //SEARCH queries
+    @Query ("SELECT * FROM movie WHERE title LIKE :query")
+    LiveData<List<Movie>> searchByTitle(String query);
+
+    @Query ("SELECT * FROM movie WHERE CAST(releaseYear AS VARCHAR(8)) LIKE :query")
+    LiveData<List<Movie>> searchByYear(String query);
+
 }

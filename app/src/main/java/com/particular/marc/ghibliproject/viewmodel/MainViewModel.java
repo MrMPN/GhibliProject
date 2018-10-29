@@ -35,63 +35,31 @@ public class MainViewModel extends AndroidViewModel {
         super(application);
         Log.d(TAG, "MainViewModel: Constructor");
         repository = MovieRepository.getInstance(application);
-        filter.setValue("START");
+        filter.setValue("");
         trigger = new CustomLiveData(repository.getMovies(), filter);
     }
 
     public LiveData<List<Movie>> getMoviesFiltered(){
         Log.d(TAG, "getMoviesFiltered: ");
-        return Transformations.map(trigger, value -> filterMovies(value.first, value.second));
+        return Transformations.switchMap(trigger, value -> filterMovies(value.first, value.second));
     }
 
-    private List<Movie> filterMovies(List<Movie> movies, final String filter) {
+    private LiveData<List<Movie>> filterMovies(List<Movie> movies, final String filter) {
         if (movies != null) {
             switch (filter) {
-                case "START":
+                case "":
+                    return repository.getMovies();
                 case BY_NAME:
                 case BY_RATING:
                 case BY_YEAR:
-                    return sortMovies(movies, filter);
+                    return repository.sortMovies(filter);
                 case FAVORITES:
-                    return selectFavorites(movies);
+                    return repository.getFavorites();
                 default:
-                    return getMatchingStrings(movies, filter);
+                    return repository.searchMovies(filter);
             }
         }
         return null;
-    }
-
-    private List<Movie> getMatchingStrings(List<Movie> movies, String regex) {
-        List<Movie> matches = new ArrayList<>();
-        Pattern p = Pattern.compile(regex);
-        if (TextUtils.isDigitsOnly(regex)){
-            int year = Integer.parseInt(regex);
-        } else {
-            for (Movie m: movies) {
-                if (p.matcher(m.getTitle()).matches()) {
-                    matches.add(m);
-                }
-            }
-        }
-        return matches;
-    }
-
-
-    private List<Movie> sortMovies(List<Movie> movies, String filter){
-        List<Movie> copy = new ArrayList<>(movies);
-        Log.d(TAG, "filterMovies: Movies " + movies.toString());
-        Collections.sort(copy, new MovieComparatorHelper(filter));
-        return copy;
-    }
-
-    private List<Movie> selectFavorites(List<Movie> movies) {
-        List<Movie> copy = new ArrayList<>();
-        for (Movie m: movies){
-            if (m.isFavorite()){
-                copy.add(m);
-            }
-        }
-        return copy;
     }
 
     public void filterBy(String filter){

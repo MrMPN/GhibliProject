@@ -4,6 +4,7 @@ package com.particular.marc.ghibliproject.repository;
 import android.app.Application;
 import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.particular.marc.ghibliproject.helper.AppExecutors;
@@ -49,6 +50,28 @@ public class MovieRepository {
         }
         return movies;
     }
+
+    public LiveData<List<Movie>> sortMovies(String sort){
+        return movieDao.sortMovies(sort);
+    }
+
+    public LiveData<List<Movie>> searchMovies(String query){
+        if (TextUtils.isDigitsOnly(query)){
+            query = "%" + query + "%";
+            return movieDao.searchByYear(query);
+        }
+        query = "%" + query + "%";
+        return movieDao.searchByTitle(query);
+    }
+
+    public LiveData<List<Movie>> getFavorites(){
+        return movieDao.getFavorites();
+    }
+
+    /**
+     * Method to fetch movies from the Ghibli API.
+     * If the call to the API is succesful we update the database
+     */
 
     private void fetchMovies(){
         Call<List<Movie>> call = service.getAllMovies();
