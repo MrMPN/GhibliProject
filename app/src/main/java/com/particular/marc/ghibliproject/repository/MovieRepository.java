@@ -7,12 +7,14 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.particular.marc.ghibliproject.fragment.MainFragment;
 import com.particular.marc.ghibliproject.helper.AppExecutors;
 import com.particular.marc.ghibliproject.database.AppDatabase;
 import com.particular.marc.ghibliproject.database.MovieDao;
 import com.particular.marc.ghibliproject.model.Movie;
 import com.particular.marc.ghibliproject.network.ApiRequest;
 import com.particular.marc.ghibliproject.network.RetrofitClientInstance;
+import com.particular.marc.ghibliproject.viewmodel.MainViewModel;
 
 import java.util.List;
 
@@ -25,7 +27,7 @@ public class MovieRepository {
     private ApiRequest service;
     private MovieDao movieDao;
     private static MovieRepository instance;
-    private final LiveData<List<Movie>> movies;
+    private LiveData<List<Movie>> movies;
     private AppExecutors mExecutors = AppExecutors.getInstance();
 
     public static synchronized MovieRepository getInstance(Application application){
@@ -38,21 +40,21 @@ public class MovieRepository {
 
     private MovieRepository(Application application){
         Log.d(TAG, "MovieRepository: Initializing");
+        initData(application);
+    }
+
+    private void initData(Application application){
         AppDatabase db = AppDatabase.getInstance(application.getApplicationContext());
         service = RetrofitClientInstance.getRetrofitInstance().create(ApiRequest.class);
         movieDao = db.movieDao();
-        movies = movieDao.getMovies();
-    }
-
-    public LiveData<List<Movie>> getMovies(){
+        this.movies = movieDao.getMoviesSorted(MainViewModel.BY_NAME_ASC);
         if (movies.getValue() == null || movies.getValue().isEmpty()){
             fetchMovies();
         }
-        return movies;
     }
 
-    public LiveData<List<Movie>> sortMovies(String sort){
-        return movieDao.sortMovies(sort);
+    public LiveData<List<Movie>> getMoviesSorted(String sort){
+        return movieDao.getMoviesSorted(sort);
     }
 
     public LiveData<List<Movie>> searchMovies(String query){
@@ -80,12 +82,7 @@ public class MovieRepository {
             public void onResponse(@NonNull Call<List<Movie>> call, @NonNull Response<List<Movie>> response) {
                 Log.d(TAG, "onResponse:");
                 final List<Movie> list = response.body();
-                mExecutors.diskIO().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        movieDao.insert(list);
-                    }
-                });
+                mExecutors.diskIO().execute(() -> movieDao.insert(list));
             }
             @Override
             public void onFailure(@NonNull Call<List<Movie>> call, @NonNull Throwable t) {
@@ -96,12 +93,7 @@ public class MovieRepository {
 
 
     public void saveFavoriteStatus(final Movie movie){
-        mExecutors.diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                movieDao.update(movie);
-            }
-        });
+        mExecutors.diskIO().execute(() -> movieDao.update(movie));
     }
 
 }

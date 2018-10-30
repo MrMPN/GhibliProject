@@ -25,16 +25,15 @@ public interface MovieDao {
     @Update
     void update(Movie movie);
 
-    @Query("SELECT * FROM movie")
-    LiveData<List<Movie>> getMovies();
-
-
     //FILTER queries
     @Query("SELECT * FROM movie ORDER BY " +
             "CASE WHEN :sort = 'by_name' THEN title " +
             "WHEN :sort = 'by_year' THEN releaseYear " +
-            "WHEN :sort = 'by_rating' THEN score END ASC")
-    LiveData<List<Movie>> sortMovies(String sort);
+            "WHEN :sort = 'by_rating' THEN score END ASC," +
+            "CASE WHEN :sort = 'by_name_desc' THEN title " +
+            "WHEN :sort = 'by_year_desc' THEN releaseYear " +
+            "WHEN :sort = 'by_rating_desc' THEN score END DESC")
+    LiveData<List<Movie>> getMoviesSorted(String sort);
 
     @Query ("SELECT * FROM movie WHERE favorite = 1")
     LiveData<List<Movie>> getFavorites();

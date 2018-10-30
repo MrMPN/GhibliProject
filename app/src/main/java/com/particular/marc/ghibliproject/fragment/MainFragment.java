@@ -28,15 +28,14 @@ import com.particular.marc.ghibliproject.viewmodel.MainViewModel;
 
 import java.util.List;
 
-import static com.particular.marc.ghibliproject.helper.MovieComparatorHelper.ASC;
-import static com.particular.marc.ghibliproject.helper.MovieComparatorHelper.DESC;
-
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MainFragment extends Fragment implements ListItemClickListener {
     private static final String TAG = "MainFragment";
+    public static final int ASC = 0;
+    public static final int DESC = 1;
     private RecyclerViewAdapter adapter;
     private MainViewModel viewModel;
 
@@ -68,12 +67,9 @@ public class MainFragment extends Fragment implements ListItemClickListener {
 
     private void initViewModel(){
         viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        viewModel.getMoviesFiltered().observe(getViewLifecycleOwner(), new Observer<List<Movie>>() {
-            @Override
-            public void onChanged(@Nullable List<Movie> movies) {
-                Log.d(TAG, "onChanged: LiveData changed");
-                adapter.swap(movies);
-            }
+        viewModel.getMoviesFiltered().observe(getViewLifecycleOwner(), movies -> {
+            Log.d(TAG, "onChanged: LiveData changed");
+            adapter.swap(movies);
         });
     }
 
@@ -126,14 +122,14 @@ public class MainFragment extends Fragment implements ListItemClickListener {
             case R.id.sort_by_name:
                 int nameSortOrder = sharedPreferences.getInt(getString(R.string.sort_by_name_key), ASC);
                 nameSortOrder = (nameSortOrder == ASC) ? DESC : ASC;
-                viewModel.filterBy(MainViewModel.BY_NAME);
+                viewModel.filterBy(MainViewModel.BY_NAME_ASC);
                 editor.putInt(getString(R.string.sort_by_name_key), nameSortOrder);
                 break;
             case R.id.sort_by_rating:
-                viewModel.filterBy(MainViewModel.BY_RATING);
+                viewModel.filterBy(MainViewModel.BY_RATING_DESC);
                 break;
             case R.id.sort_by_year:
-                viewModel.filterBy(MainViewModel.BY_YEAR);
+                viewModel.filterBy(MainViewModel.BY_YEAR_ASC);
                 break;
         }
         editor.apply();
